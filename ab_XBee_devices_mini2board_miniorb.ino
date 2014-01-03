@@ -60,8 +60,8 @@ void loop(){
     //===== check all sensors
     light = max(getLight(lightPin,40),pLight);
     sound = max(getSound(soundPin,50),pSound);
-    temp = (myDHT22.getTemperatureC()+40)*10; // (conert temperature, -40c - 80c with 0.1 increment,  to 10bit value)
-    humid = (myDHT22.getHumidity())*10;       // (convert humidity, 0 - 100% with 0.1 increment, to 1bit value)
+    temp = (myDHT22.getTemperatureC()+40)*10; // (conert temperature, -40c ~ 80c with 0.1 increment,  to 10bit value)
+    humid = (myDHT22.getHumidity())*10;       // (convert humidity, 0 ~ 100% with 0.1 increment, to 1bit value)
     
     playBuzz(bRise, bPitch, bDuration);
   }

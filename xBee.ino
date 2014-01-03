@@ -7,11 +7,11 @@ void receiveXbeeData()
       // now fill our zb rx class
       xbee.getResponse().getZBRxResponse(rx);
 
-      //      if (rx.getOption() == ZB_PACKET_ACKNOWLEDGED) { // the sender got an ACK
-      //        //flashLed(statusLedPin, 2, 100);
-      //      } else { // we got it (obviously) but sender didn't get an ACK
-      //        //flashLed(statusLedPin, 4, 100);
-      //      }
+//      if (rx.getOption() == ZB_PACKET_ACKNOWLEDGED) { // the sender got an ACK
+//        //flashLed(statusLedPin, 2, 100);
+//      } else { // we got it (obviously) but sender didn't get an ACK
+//        //flashLed(statusLedPin, 4, 100);
+//      }
 
       remoteData[0] = rx.getData(0);
       
@@ -21,12 +21,16 @@ void receiveXbeeData()
         case 0:
           sendXbeeData();
           break;
-        case 6:
-          //sendXbeeData();
-          if(remoteData[3] > 3) bDuration = remoteData[3]; // 0 and 1 do not change alarm status
+        case 7:
+          sendXbeeData();
+          if(remoteData[3] > 3) bDuration = remoteData[3]; // 0,2 and 3 do not change alarm status
           if(remoteData[3] == 1) bDuration = 0;            // 1 means force alarm to stop remotely
           bRise = remoteData[1];
           bPitch = remoteData[2];
+          _gp[0] = remoteData[4];
+          _gp[1] = remoteData[5];
+          _gp[2] = remoteData[6];
+          _gp[3] = remoteData[7];
           break;
       }
     } 
@@ -98,7 +102,7 @@ void sendXbeeData(){
     payload[15] = (_pp[2]>>7) & 15;          // next 4 higher mini-orb Sound Preference value
     payload[16] = _pp[3] & 127;              // low 7 bits to mini-orb Social Preference value
     payload[17] = (_pp[3]>>7) & 15;          // next 4 higher mini-orb Social Preference value
-    payload[18] = interacted & 255;          // mini-orb was interacted (1) or not (2);
+    payload[18] = interacted & 255;          // mini-orb was interacted (1) or not (0);
     interacted = 0;
   }
   
