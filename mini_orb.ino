@@ -19,14 +19,14 @@ void controlMiniOrb()
     swDown = true;
     wheelMoved = false;
     actionTimer = millis();
-    centreBuzz = false;
     interacted = 1;
     bDuration = 0;
   }else if(sw<200 && swDown){ // if switch state changed from on to off
-    _pp[senseState] = wheel;
+    if(wheelMoved) _pp[senseState] = wheel;
     swDown = false;
     swBuzz=false;
     wheelMoved = false;
+    interacted = 1;
     modeState = 0;
     transition = 0;
     dimgrow = 0;
@@ -45,6 +45,7 @@ void controlMiniOrb()
   }
   
   int rgb[3]; // RGB LED colours
+  
   
   if(!wheelMoved && !swDown){
     int ts = 128; // transition speed
@@ -97,9 +98,7 @@ void controlMiniOrb()
       ledTimer=millis();
       //if(transition==ts+(ts/ts) || transition==(ts*2)+(ts/ts) || transition==(ts*3)+(ts/ts) || transition==(ts*4)+(ts/ts)){
       if(transition>=(ts*4)-4){
-        if(modeState==0) {digitalWrite(ledPin1, 0); digitalWrite(ledPin2, 0);}
-        if(modeState==1) {digitalWrite(ledPin1, 0); digitalWrite(ledPin2, 0);}
-        if(modeState==2) {digitalWrite(ledPin1, 0); digitalWrite(ledPin2, 0);}
+        digitalWrite(ledPin1, 0); digitalWrite(ledPin2, 0);
       //}else if(transition==ts || transition==(ts*2) || transition==(ts*3) || transition==(ts*4)){
       }else if(transition>=ts){
         if(modeState==0) {digitalWrite(ledPin1, 0); digitalWrite(ledPin2, 1);}
@@ -122,6 +121,8 @@ void controlMiniOrb()
         dimgrow+=1;
       }
     }
+    
+    
   }else if(wheelMoved && !swDown){
     int r=2, p=100, d=2;     // for feedback sound
     int b=15;                 // buffer for mode change
@@ -158,21 +159,20 @@ void controlMiniOrb()
       modeState = 0;
       transition = 0;
       dimgrow = 0;
-      bDuration = 0;
-      digitalWrite(ledPin1,0); digitalWrite(ledPin2,0); // turn middle indicator LED on
+      //bDuration = 0;
+      digitalWrite(ledPin1,0); digitalWrite(ledPin2,0); // turn indicator LEDs off
     }
+    
+    
   }else if(swDown){
     digitalWrite(ledPin1, 1); digitalWrite(ledPin2, 0); // turn middle indicator LED on
     if(!swBuzz) {playBuzz(10, 100, 5); swBuzz=true;} // play feedback sound - (rise, start pitch, duration)
     actionTimer = millis();
-    prevWheel = wheel;
-    wheelMoved = false;
     
-    //int brightness = map((wheel/4)*(wheel/4),0,(128*128),0,512);
-    //_pp[senseState] = wheel;
-    mode_matrix[senseState][1] = map(wheel,0,511,0,255);
-    modeState = 0;
-    transition=0;
+    if(wheelMoved){ 
+      mode_matrix[senseState][1] = map(wheel,0,511,0,255);
+    }
+    
     switch(senseState){
       case 0:
         rgb[0]=mode_matrix[senseState][1];
@@ -197,15 +197,15 @@ void controlMiniOrb()
     }
     
     int r=1, p=100, d=1;     // for feedback sound
-    int b=2;                 // buffer for mode change
-    int t[] = {0,64,128,192,240,272,320,384,448,512};  // wheel position to change mode
+    int b=5;                 // buffer for mode change
+    int t[] = {0,32,96,160,224,288,352,416,480,512};  // wheel position to change mode
     switch(brightnessBeepPos){
       case 3:
         if(wheel < t[brightnessBeepPos]-b) {brightnessBeepPos = brightnessBeepPos-1; playBuzz(r, 800, d);}
-        if(wheel > t[brightnessBeepPos+1]+b) {brightnessBeepPos = brightnessBeepPos+1; playBuzz(2, 50, 8);}
+        if(wheel > t[brightnessBeepPos+1]+b) {brightnessBeepPos = brightnessBeepPos+1; playBuzz(3, 50, 8);}
         break;
       case 5:
-        if(wheel < t[brightnessBeepPos]-b) {brightnessBeepPos = brightnessBeepPos-1; playBuzz(2, 50, 4);}
+        if(wheel < t[brightnessBeepPos]-b) {brightnessBeepPos = brightnessBeepPos-1; playBuzz(3, 50, 4);}
         if(wheel > t[brightnessBeepPos+1]+b) {brightnessBeepPos = brightnessBeepPos+1; playBuzz(r, 800, d);}
         break;
       default:
@@ -215,7 +215,6 @@ void controlMiniOrb()
     }
   }
   
-  //rgb[1] = map(rgb[1],0,255,0,200); // calibrate Green LED
   analogWrite(rePin,calibrateLed(rgb[0]));
   analogWrite(grPin,calibrateLed(rgb[1]));
   analogWrite(blPin,calibrateLed(rgb[2]));
