@@ -86,7 +86,6 @@ int mode_matrix[4][3] = {        // sensor values for 3 modes (sensor, self-pref
     {128,128,128},
     {128,128,128}
   };
-int _sensors[] = {128,128,128,128}; // current sensor values [temp, light, sound, social] from own sensors
 int _pp[] = {256,256,256,256};      // personal preferences [temp, light, sound, social] from own Orb setting
 int _gp[] = {128,128,128,128};      // group preferences [temp, light, sound, social] from Xively
 int matrixLocNumPrev = 0;        // previous sense value of where matrix position autoplay is at

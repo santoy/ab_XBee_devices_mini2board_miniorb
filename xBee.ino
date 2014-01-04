@@ -27,10 +27,10 @@ void receiveXbeeData()
           if(remoteData[3] == 1) bDuration = 0;            // 1 means force alarm to stop remotely
           bRise = remoteData[1];
           bPitch = remoteData[2];
-          _gp[0] = remoteData[4];
-          _gp[1] = remoteData[5];
-          _gp[2] = remoteData[6];
-          _gp[3] = remoteData[7];
+          _gp[0] = remoteData[4]/2;
+          _gp[1] = remoteData[5]/2;
+          _gp[2] = remoteData[6]/2;
+          _gp[3] = remoteData[7]/2;
           break;
       }
     } 

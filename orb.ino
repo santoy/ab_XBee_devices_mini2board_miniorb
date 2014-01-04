@@ -46,48 +46,39 @@ void controlMiniOrb()
   
   int rgb[3]; // RGB LED colours
   
-  
   if(!wheelMoved && !swDown){
-    int ts = 128; // transition speed
-    int adjustled = map(dimgrow,0,ts,matrixLocNumPrev,mode_matrix[senseState][modeState]);
-    int growled = 0;
-    int dimled = 0;
+    int ts = 128; // transition speed - defines 1/4 of how long a mode-state is shown
+    int adjusted = 0; // defines amount of change of LED intensity from previous intensity
+    int growled = 0; // current intensity of growing LED
+    int dimled = 0;  // current intensity of dimming LED
+    
     if(modeState == 0){
-      growled = map(dimgrow,0,ts,0,mode_matrix[senseState][modeState]);
-      dimled = map(dimgrow,0,ts,matrixLocNumPrev,0);
+      growled = map(dimgrow,0,ts,0,mode_matrix[senseState][modeState]); // set current intensity of growing LED
+      dimled = map(dimgrow,0,ts,matrixLocNumPrev,0); // set current intensity of dimming LED
     }else{
       growled = map(dimgrow,0,ts,matrixLocNumPrev,mode_matrix[senseState][modeState]);
-      dimled = 0;
+      dimled = 0; 
     }
+    
+    adjusted = map(dimgrow,0,ts,matrixLocNumPrev,mode_matrix[senseState][modeState]);
+    
     switch(senseState){
       case 0:
-        _sensors[0] = map((constrain(temp,500,800) - 500),0,300,0,255);  // limit temperature to 10c ~ 40c before mapping
-        mode_matrix[0][0] = _sensors[0];
-        mode_matrix[0][2] = _gp[0];
         rgb[0] = growled;
         rgb[1] = dimled;
         rgb[2] = 0;
         break;
       case 1:
-        _sensors[1] = map(light,0,1023,0,255);
-        mode_matrix[1][0] = _sensors[1];
-        mode_matrix[1][2] = _gp[1];
-        rgb[0] = adjustled;
+        rgb[0] = adjusted;
         rgb[1] = growled;
         rgb[2] = 0;
         break;
       case 2:
-        _sensors[2] = map(sound,0,1023,0,255);
-        mode_matrix[2][0] = _sensors[2];
-        mode_matrix[2][2] = _gp[2];
         rgb[0] = dimled;
         rgb[1] = dimled;
         rgb[2] = growled;
         break;
       case 3:
-        _sensors[3] = 128;  // not sure how this value is to be generated yet.
-        mode_matrix[3][0] = _sensors[3];
-        mode_matrix[3][2] = _gp[3];
         rgb[0] = 0;
         rgb[1] = growled;
         rgb[2] = dimled;
@@ -108,9 +99,15 @@ void controlMiniOrb()
         
       transition+=1;
       if(transition>(ts*4)-1){
+        matrixLocNumPrev = mode_matrix[senseState][modeState];
+        mode_matrix[0][0] = map((constrain(temp,500,800) - 500),0,300,0,255);  // limit temperature to 10c ~ 40c before mapping
+        mode_matrix[1][0] = map(light,0,1023,0,255);
+        mode_matrix[2][0] = map(sound,0,1023,0,255);
+        mode_matrix[3][0] = 128;  // not sure how this value (social) should be sensed locally.
+        for(int x=0; x<4; x++) mode_matrix[x][2] = _gp[x];
+        
         transition=0;
         dimgrow=0;
-        matrixLocNumPrev = mode_matrix[senseState][modeState];
         modeState += 1;
         if(modeState>2) {
           modeState=0; 
