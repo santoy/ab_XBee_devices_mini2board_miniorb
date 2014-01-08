@@ -8,7 +8,7 @@ int getSound(int _spin, int _duration) // this deals with sound wave
   int myMax=0;
   int myMin=1023;
   unsigned long sampleTimer = millis();
-  while(millis() - sampleTimer < _duration)
+  while(sampleTimer + _duration > millis())
   {
     sample = analogRead(_spin);
     myMax=max(myMax,sample);

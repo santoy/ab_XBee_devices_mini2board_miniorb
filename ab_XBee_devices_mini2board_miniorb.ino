@@ -52,14 +52,17 @@ void loop(){
   receiveXbeeData();
   
   if(millis() > sensorTimer + sensorInterval || millis() < sensorTimer){
-    sensorTimer = millis();
-    //===== store previous sensor values
-    pLight = light;
-    pSound = sound;
+    sensorTimer += sensorInterval;
     
     //===== check all sensors
-    light = max(getLight(lightPin,40),pLight);
-    sound = max(getSound(soundPin,50),pSound);
+    for(int x=0; x<29; x++) lights[29-x] = lights[28-x];
+    for(int x=0; x<29; x++) sounds[29-x] = sounds[28-x];
+    lights[0] = getLight(lightPin,10);
+    sounds[0] = getSound(soundPin,25);
+    for(int x=0; x<30; x++) light += lights[x];
+    for(int x=0; x<30; x++) sound += sounds[x];
+    light /= 30;
+    sound /= 30;
     temp = (myDHT22.getTemperatureC()+40)*10; // (conert temperature, -40c ~ 80c with 0.1 increment,  to 10bit value)
     humid = (myDHT22.getHumidity())*10;       // (convert humidity, 0 ~ 100% with 0.1 increment, to 1bit value)
     

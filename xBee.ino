@@ -23,7 +23,7 @@ void receiveXbeeData()
           break;
         case 7:
           sendXbeeData();
-          if(remoteData[3] > 3) bDuration = remoteData[3]; // 0,2 and 3 do not change alarm status
+          if(remoteData[3] > 2) bDuration = remoteData[3]; // 0 and 2 do not change alarm status
           if(remoteData[3] == 1) bDuration = 0;            // 1 means force alarm to stop remotely
           bRise = remoteData[1];
           bPitch = remoteData[2];
@@ -106,12 +106,7 @@ void sendXbeeData(){
     interacted = 0;
   }
   
-  light=0;
-  pLight=0;
-  sound=0;
-  pSound=0;
   jsbyte=0;
-  swCurrentState=0;
         
   xbee.send(zbTx);
   

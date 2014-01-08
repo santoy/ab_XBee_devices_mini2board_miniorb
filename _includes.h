@@ -39,8 +39,10 @@ unsigned long dhtTimer=0;
 const int dhtInterval=2500;
 
 //===== sensor variables
-int light=0;                    // LDR analog value
-int sound=0;                    // sound sensor analog value
+int light=0;                    // LDR average analog value of last 30 1/s samples
+int lights[30];                 // 30 samples of light sensor value
+int sound=0;                    // sound sensor average analog value of last 30 1/s samples
+int sounds[30];                 // 30 samples of sound sensor value
 int temp=0;                     // temperature sensor temperature value
 int humid=0;                    // humidity sensor humidity value
 int pot=0;                      // potentiometer value
@@ -53,7 +55,6 @@ const int sensorInterval=1000;  // interval (ms) for checking sensors
 
 //===== keeping some of previous sensor values
 int pLight=0;
-int pSound=0;
 
 //===== XBee wireless communication
 XBee xbee = XBee();
@@ -67,41 +68,12 @@ ModemStatusResponse msr = ModemStatusResponse();
 int remoteData[10];
 
 //===== Mini-Orb
-int sw = 0;                      // mini-orb switch
-int swState = 0;                 // mini-orb switch state
-int swCurrentState = 0;          // Monitor if states have been changed during each XBee communication
-boolean swDown = false;          // switch state
-boolean swBuzz = false;          // make feedback sound once when switch is pressed
-boolean centreBuzz = false;      // make feedback sound when centre point of wheel is found
 int wheel = 0;                   // mini-orb potentiometer
 int prevWheel = 0;               // previous state of mini-orb potentiometer
-boolean wheelMoved = false;      // wheel state (wheter it was moved or not)
-int wheelPos = 0;                // position of wheel (0-3)
-unsigned long wheelTimer = 0;    // timer to monitor change of wheel value
-int s1=0, s2=0, s3=0, rgbState=0;// RGB led values and which led to change
-int brightnessBeepPos = 0;       // beep position in the brightness setting 
-int mode_matrix[4][3] = {        // sensor values for 3 modes (sensor, self-preference, group-preference)
-    {128,128,128},
-    {128,128,128},
-    {128,128,128},
-    {128,128,128}
-  };
-int _pp[] = {256,256,256,256};      // personal preferences [temp, light, sound, social] from own Orb setting
-int _gp[] = {128,128,128,128};      // group preferences [temp, light, sound, social] from Xively
-int matrixLocNumPrev = 0;        // previous sense value of where matrix position autoplay is at
-unsigned long ledTimer = 0;      // timer to monitor RGB led transition time
-unsigned long actionTimer = -10000;   // timer to monitor interaction
-unsigned long switchTimer = 0;   // timer to monitor the last time the switch is pressed
-unsigned long buzzTimer = 0;     // timer to randomise the instruciton buzz
-int randomTime = 100;            // interval to play instruction buzz
-int actionPeriod = 30000;        // time before actionTimer resets
-int dimgrow = 0;                 // whether RGB LED is growing or dimming
-int transition = 0;              // colour state of each RGB LED
-int modeState = 0;               // which mode (sensor, you, others) in automatic display
-int senseState = 0;              // which sensor info (temp, light, sound, social) in automatic display
-int lightLevel = 255;            // leght level of RGB LED
-int bRise = 0;
-int bPitch = 0;
-int bDuration = 0;               // alarm duration
-int interacted = 0;                  // whether orb is interacted or not.
+int _pp[] = {256,256,256,256};   // personal preferences [temp, light, sound, social] from own Orb setting
+int _gp[] = {128,128,128,128};   // group preferences [temp, light, sound, social] from Xively
+int bRise = 0;                   // buzzer: how many time the original pitch is to be doubled
+int bPitch = 0;                  // buzzer: initial pitch - or to be more precise, duration of half-cycle in microseconds
+int bDuration = 0;               // buzzer: how many times the pitch is to play
+int interacted = 0;              // whether orb is interacted or not.
 
